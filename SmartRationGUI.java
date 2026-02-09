@@ -1,14 +1,18 @@
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import javax.swing.table.DefaultTableCellRenderer;
-import javax.swing.table.TableCellRenderer;
-import java.awt.image.BufferedImage;
 import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
+import javax.swing.*;
+import javax.swing.Timer;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
 
 /**
  * EquiEat - SMART RATIONING SYSTEM
@@ -53,18 +57,27 @@ public class SmartRationGUI extends JFrame { // Creates our GUI/Window
     // Loading screen - shows fancy animation while app starts
     // Makes user think something is happening
     static class bootStrapper extends JFrame {
+        
+        static ImageIcon[] frames;
+        static JLabel animationLabel;
+        static int currentFrame = 0;
+
         public bootStrapper() {
             AuditLogger tempLogger = new AuditLogger();
             tempLogger.log("SYSTEM_STARTUP", "Application launched.");
 
+            
             setTitle("BootStrapper - Smart Rationing System");
             setSize(1000, 500);
             setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             setLocationRelativeTo(null);
+            setUndecorated(true); // No title bar, just the content
+            setShape(new RoundRectangle2D.Double(0, 0, getWidth(), getHeight(), 50, 50)); // Rounded corners
+            setIconImage(new ImageIcon("Icon.png").getImage());
 
             // Put background image as the base
             // All buttons and labels go on top of it
-            JLabel background = new JLabel(new ImageIcon("bootStrapBG.png"));
+            JLabel background = new JLabel(new ImageIcon("resources\\bootStrapBG.png"));
             background.setLayout(new BorderLayout());
             setContentPane(background);
 
@@ -76,6 +89,10 @@ public class SmartRationGUI extends JFrame { // Creates our GUI/Window
             JPanel bottomPanel = new JPanel(new BorderLayout());
             JLabel loadingStatus = new JLabel("Loading... ", SwingConstants.LEFT);
             JLabel percentage = new JLabel("0%", SwingConstants.RIGHT);
+
+            // Uses array to store the file of each frames
+            frames = new ImageIcon[5];
+
             loadingStatus.setFont(new Font("Arial", Font.PLAIN, 15));
             percentage.setFont(new Font("Arial", Font.PLAIN, 15));
 
@@ -85,9 +102,36 @@ public class SmartRationGUI extends JFrame { // Creates our GUI/Window
             background.add(label, BorderLayout.CENTER);
             background.add(bottomPanel, BorderLayout.SOUTH);
 
+            frames[0] = new ImageIcon("resources\\frame1.png");
+            frames[1] = new ImageIcon("resources\\frame2.png");
+            frames[2] = new ImageIcon("resources\\frame3.png");
+            frames[3] = new ImageIcon("resources\\frame4.png");
+            frames[4] = new ImageIcon("resources\\frame5.png");
+
+            // Animation starts at frame 1 or index 0
+            animationLabel = new JLabel(frames[0]);
+            add(animationLabel, BorderLayout.CENTER);
+
+            animationLabel.setSize(200, 200);
+            Timer timer = new Timer(200, new ActionListener(){
+                @Override 
+                public void actionPerformed(ActionEvent e){
+                    currentFrame++; // increments array index 
+                
+                    if(currentFrame >= frames.length){ // checks if the current frame is greater than to the frames length
+                        currentFrame =0; // resets the frame to 0
+                    }
+
+                    animationLabel.setIcon(frames[currentFrame]); // shows the label animation in the current [0] index
+                }
+            });
+
+        timer.start();
+
+
             // Need array because we want to change progress inside the timer
             int[] progress = {0};
-            javax.swing.Timer progressTimer = new javax.swing.Timer(50, e -> {
+            Timer progressTimer = new Timer(50, e -> {
                 progress[0]++;
                 percentage.setText(progress[0] + "%");
 
@@ -164,7 +208,7 @@ public class SmartRationGUI extends JFrame { // Creates our GUI/Window
         equieatBrand.setFont(new Font("SansSerif", Font.BOLD, 30));
         equieatBrand.setForeground(Color.WHITE);
         ImageIcon logoIcon = null;
-        try { logoIcon = new ImageIcon("logo.png"); } catch (Exception ignored) {}
+        try { logoIcon = new ImageIcon("resources\\logo.png"); } catch (Exception ignored) {}
         JLabel logoLabel = (logoIcon != null && logoIcon.getIconWidth() > 0)
                 ? new JLabel(logoIcon)
                 : new JLabel("Supplies", SwingConstants.CENTER);
