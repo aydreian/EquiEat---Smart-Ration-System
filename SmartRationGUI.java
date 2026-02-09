@@ -162,7 +162,7 @@ public class SmartRationGUI extends JFrame { // Creates our GUI/Window
 
         // Load and scale the window icon (32x32 pixels)
         try {
-            ImageIcon icon = new ImageIcon("icon.png");
+            ImageIcon icon = new ImageIcon("resources\\icon.png");
             Image scaledIcon = icon.getImage().getScaledInstance(32, 32, Image.SCALE_SMOOTH);
             setIconImage(scaledIcon);
         } catch (Exception ignored) {}
